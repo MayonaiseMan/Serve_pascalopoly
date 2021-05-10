@@ -79,16 +79,40 @@ namespace Serve_pascalopoly
                             off += i;
                             data = data.ToLower();
                             _main.Disambiguatore(data);
+                            
                         }
                     }
                     catch(Exception ex)
                     {
                         throw ex;
                     }
+
                 }
 
 
             });
+        }
+
+
+        public enum metodoSend { flooding, single};
+        public void SenToClient(metodoSend metodo,string msg, string nome = "")
+        {
+            if(metodo == metodoSend.flooding)
+            {
+                foreach(KeyValuePair<string, TcpClient> pair in ClientConnessi)
+                {
+                    NetworkStream stream = pair.Value.GetStream();
+                    byte[] bytes = Encoding.ASCII.GetBytes(msg);
+                    stream.Write(bytes,0,bytes.Length);
+                }
+            }   
+            else if(nome != null )
+            {
+                TcpClient client = ClientConnessi[nome];
+                NetworkStream stream = client.GetStream();
+                byte[] bytes = Encoding.ASCII.GetBytes(msg);
+                stream.Write(bytes, 0, bytes.Length);
+            }
         }
 
         public IPAddress LocalIp
