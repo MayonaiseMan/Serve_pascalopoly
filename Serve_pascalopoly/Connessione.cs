@@ -63,9 +63,31 @@ namespace Serve_pascalopoly
         public async void ListenToTheStereo(TcpClient client) //yeah i know, i have several mental problem
         {
             await Task.Run(() => {
-                byte[] buffer;    
-                
-            
+
+                int off = 0;
+                NetworkStream linea = client.GetStream();
+                string data = null;
+                int i = 0;
+                while (true)
+                {
+                    try
+                    {
+                        byte[] buffer = new byte[10000];
+                        if ((i = linea.Read(buffer, 0, buffer.Length)) != 0)
+                        {
+                            data = Encoding.ASCII.GetString(buffer);
+                            off += i;
+                            data = data.ToLower();
+                            _main.Disambiguatore(data);
+                        }
+                    }
+                    catch(Exception ex)
+                    {
+                        throw ex;
+                    }
+                }
+
+
             });
         }
 

@@ -29,7 +29,7 @@ namespace Serve_pascalopoly
 
         }
 
-        public void Disambiguatore(byte[] vs)
+        public void Disambiguatore(string vs)
         {
             //TODO: roba
         }
