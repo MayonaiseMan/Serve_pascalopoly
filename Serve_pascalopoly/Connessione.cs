@@ -53,6 +53,7 @@ namespace Serve_pascalopoly
                     //waiting for connection
                     TcpClient client = Listener.AcceptTcpClient();
                     string tmp = "client" + (ClientConnessi.Count + 1);
+                    ListenToTheStereo(client);
                     ClientConnessi.Add(tmp,client);
                     
                     _main.WriteConsole("nuova connessione con: " + client.Client.LocalEndPoint.ToString());
@@ -60,11 +61,11 @@ namespace Serve_pascalopoly
             });
         }
 
-        public async void ListenToTheStereo(TcpClient client) //yeah i know, i have several mental problem
+        public async void ListenToTheStereo(TcpClient client) //yeah i know, i have several mental problem (mirai-hen)
         {
             await Task.Run(() => {
 
-                int off = 0;
+                
                 NetworkStream linea = client.GetStream();
                 string data = null;
                 int i = 0;
@@ -76,7 +77,6 @@ namespace Serve_pascalopoly
                         if ((i = linea.Read(buffer, 0, buffer.Length)) != 0)
                         {
                             data = Encoding.ASCII.GetString(buffer);
-                            off += i;
                             data = data.ToLower();
                             _main.Disambiguatore(data);
                             
@@ -106,7 +106,7 @@ namespace Serve_pascalopoly
                     stream.Write(bytes,0,bytes.Length);
                 }
             }   
-            else if(nome != null )
+            else if(nome != "" )
             {
                 TcpClient client = ClientConnessi[nome];
                 NetworkStream stream = client.GetStream();
@@ -131,20 +131,7 @@ namespace Serve_pascalopoly
         
 
 
-        public byte[] GetBufferHead()
-        {
-            if(Buffer.Count > 0)
-            {
-                byte[] vs = Buffer.Dequeue();
-                return vs;
-            }
-            else
-            {
-                return new byte[0];
-            }
-            
-
-        }
+        
 
         public string GetLocalIPAddress()
         {
