@@ -61,7 +61,7 @@ namespace Serve_pascalopoly
             });
         }
 
-        public async void ListenToTheStereo(TcpClient client) //yeah i know, i have several mental problem (mirai-hen)
+        public async void ListenToTheStereo(TcpClient client) //yeah i know, i have several mental problem, however it's katekyo hitman reborn opening song n°8 
         {
             await Task.Run(() => {
 
