@@ -55,7 +55,7 @@ namespace Serve_pascalopoly
                     string tmp = "client" + (ClientConnessi.Count + 1);
                     ListenToTheStereo(client);
                     ClientConnessi.Add(tmp,client);
-                    
+                    _main.AggiornaClientView();
                     _main.WriteConsole("nuova connessione con: " + client.Client.LocalEndPoint.ToString());
                }
             });

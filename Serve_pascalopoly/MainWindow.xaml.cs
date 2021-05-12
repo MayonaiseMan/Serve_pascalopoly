@@ -12,6 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Net;
+using System.Net.Sockets;
 
 namespace Serve_pascalopoly
 {
@@ -21,15 +23,25 @@ namespace Serve_pascalopoly
     public partial class MainWindow : Window
     {
         private Dictionary<string, string> clientGiocatore;
+        Connessione _connessione;
         public MainWindow()
         {
             InitializeComponent();
-
-
-
-
+            client_view.ItemsSource = _connessione.ClientConnessi;
         }
         private List<string> log;
+
+
+        public void AggiornaClientView()
+        {
+            client_view.Items.Clear();            
+            foreach(KeyValuePair<string,TcpClient> client in _connessione.ClientConnessi)
+            {
+                client_view.Items.Add(client);
+            }
+            
+            
+        }
 
         public void Aggiorna(string[] cmd)
         {
