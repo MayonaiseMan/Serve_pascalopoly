@@ -19,10 +19,10 @@ namespace Serve_pascalopoly
 
             try
             {
-                //get local machine ip
+                //qui ricavo il mio ip locala grazie a un metodo che utilizza la classe DNS (il metodo si trova in fondo)
                 LocalIp = IPAddress.Parse(GetLocalIPAddress());
 
-                //generate Listener foc tcp connection
+                //Creu un oggetto Tcp listener che ascolta per una qualunque connessione tcp sulla porta 50000
                 Listener = new TcpListener(LocalIp, LOCAL_PORT);
 
                 _main = main;
@@ -35,6 +35,7 @@ namespace Serve_pascalopoly
             } 
         }
 
+        //qui salvo tutti i miei client con come nome Clien + numero ordinato in basa a quando si è connesso
         public Dictionary<string,TcpClient> ClientConnessi
         {
             get;
@@ -50,12 +51,22 @@ namespace Serve_pascalopoly
                     _main.WriteConsole("In attesa di connessione...");
 
 
-                    //waiting for connection
+                    //qui il listener inizia ad ascoltare, il metodo Accept è bloccante e attende l'arrivo di una richiesta di connessione tcp
+                    //e accettandola crea un oggetto tcp client 
                     TcpClient client = Listener.AcceptTcpClient();
+
+                    
                     string tmp = "client" + (ClientConnessi.Count + 1);
+
+                    //qui invece facco partire un metodo in async che ascolta sul singolo client
                     ListenToTheStereo(client);
+
+                    //aggiungo il client alla lista di client connessi
                     ClientConnessi.Add(tmp,client);
+
+                    //aggiorno l'elenco sulla finestra
                     _main.AggiornaClientView();
+                    //scrivo un aggiornamento in modo testuale
                     _main.WriteConsole("nuova connessione con: " + client.Client.LocalEndPoint.ToString());
                }
             });
@@ -65,14 +76,18 @@ namespace Serve_pascalopoly
         {
             await Task.Run(() => {
 
-                
+                //qui prendo l'oggetto network stream dal client, esso rappresenta la linea su cui vengono scritti i byte
                 NetworkStream linea = client.GetStream();
+
+                
                 string data = null;
                 int i = 0;
                 while (true)
                 {
                     try
                     {
+                        //qui costantement in ascolto creo un buffer ovvero un array di byte e poi se la lettura del network da riscontro positivo(leggo qualcosa)
+                        //allora trasformo il buffer in una stringa e la mando al metodo disambiguatore(parte di Poli) che si occuperà di scomporlo e capire il messaggio
                         byte[] buffer = new byte[10000];
                         if ((i = linea.Read(buffer, 0, buffer.Length)) != 0)
                         {
@@ -94,6 +109,10 @@ namespace Serve_pascalopoly
         }
 
 
+
+        //qui il metodo sendTo serve a mandare informazione a uno o più client
+        //il motivo per cui ha solo modalità Flood o singola è perché gli unici casi di invio a un client sono per aggiornare lo stato della partito(tutti) o per dire al client che ha appena trasmesso
+        // che c'è un errore nella sua trasmissione
         public enum metodoSend { flooding, single};
         public void SenToClient(metodoSend metodo,string msg, string nome = "")
         {
@@ -132,7 +151,7 @@ namespace Serve_pascalopoly
 
 
         
-
+        //qui semplicemente usando la classe DNS ricavo il mio ip
         public string GetLocalIPAddress()
         {
             var host = Dns.GetHostEntry(Dns.GetHostName());
